@@ -1,0 +1,16 @@
+{
+    "name": "siemendev/contented",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Patrick Siemen",
+            "email": "post@patrick-siemen.de"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "siemendev\\contented\\": "src/"
+        }
+    }
+}
