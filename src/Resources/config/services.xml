@@ -1,8 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" ?>
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services
-        http://symfony.com/schema/dic/services/services-1.0.xsd">
+        https://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="contented.route_loader" class="Contented\Routing\ContentedRouteLoader" public="true">
+            <call method="setPageConfigLoader">
+                <argument type="service" id="contented.page_config_loader"/>
+            </call>
+            <tag name="routing.loader"/>
+        </service>
+        <service id="contented.controller" class="Contented\Controller\ContentPageController" public="true" />
+        <service id="contented.page_config_loader" class="Contented\PageConfigLoader" public="true" />
     </services>
 </container>

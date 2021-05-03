@@ -7,10 +7,13 @@
             "email": "post@patrick-siemen.de"
         }
     ],
-    "require": {},
+    "require": {
+        "ext-simplexml": "*",
+        "twig/twig": "^2.12|^3.0"
+    },
     "autoload": {
         "psr-4": {
-            "siemendev\\contented\\": "src/"
+            "Contented\\": "src/"
         }
     }
 }
