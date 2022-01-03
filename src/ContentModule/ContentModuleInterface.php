@@ -3,7 +3,7 @@ namespace Contented\ContentModule;
 
 interface ContentModuleInterface
 {
-    public static function getTag(): string;
+    public function getTag(): string;
 
-    public function render(array $config): string;
+    public function loadAdditionalData(array $data): array;
 }

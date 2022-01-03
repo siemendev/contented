@@ -5,7 +5,7 @@ namespace Contented;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class ContendedConfiguration implements ConfigurationInterface
+class ContentedConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
