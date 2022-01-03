@@ -12,7 +12,7 @@
         "php": ">=8"
     },
     "suggest": {
-        "twig/twig": "Enables TwigContentPage and TwigContentModule to render content using twig"
+        "twig/twig": "Enables rendering of twig templates, if you don't install twig you need to implement a custom renderer!"
     },
     "autoload": {
         "psr-4": {
