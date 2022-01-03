@@ -7,7 +7,7 @@ class PageConfigLoader
 {
     public function resolveXmlToArray(string $filename): array
     {
-        $element = simplexml_load_file($filename);
+        $element = simplexml_load_string(file_get_contents($filename));
         $array = [
             'id' => ($element->attributes()['id'] instanceof SimpleXMLElement ? (string) $element->attributes()['id'] : pathinfo($filename, PATHINFO_FILENAME)),
             'layout' => (string) $element->attributes()['layout'],
@@ -16,13 +16,17 @@ class PageConfigLoader
             'areas' => [],
         ];
 
+        // todo this is not unique as soon as subdirectories are supported
+        $id = pathinfo($filename, PATHINFO_FILENAME);
+        if ($element->attributes()['id'] instanceof SimpleXMLElement) {
+            $id = (string) $element->attributes()['id'];
+        }
+
+        $index = 0;
         foreach ($element->routes->route as $route) {
-            $id = pathinfo($filename, PATHINFO_FILENAME); // todo this is not unique as soon as subdirectories are supported
-            if ($element->attributes()['id'] instanceof SimpleXMLElement) {
-                $id = (string) $element->attributes()['id'];
-            }
+            $index++;
             $array['routes'][(string)($route->attributes()['path'])] = [
-                'name' => 'contented.' . $id,
+                'name' => 'contented.' . $id . ($index > 1 ? '_' . $index : ''),
             ];
         }
 

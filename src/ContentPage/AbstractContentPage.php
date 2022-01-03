@@ -3,8 +3,11 @@
 namespace Contented\ContentPage;
 
 use Contented\ContentModule\ContentModuleInterface;
-use LogicException;
+use Contented\Exception\ContentPageNotFoundException;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 abstract class AbstractContentPage implements ContentPageInterface
 {
@@ -13,15 +16,10 @@ abstract class AbstractContentPage implements ContentPageInterface
         "content_pages/%s.twig",
     ];
 
-    /** @var ContentModuleInterface[] */
-    protected $contentModules = [];
+    protected array $contentModules = [];
 
-    /** @var Environment */
-    protected $environment;
-
-    public function __construct(Environment $environment)
+    public function __construct(protected Environment $environment)
     {
-        $this->environment = $environment;
     }
 
     public function addContentModule(string $area, ContentModuleInterface $contentModule, array $config): ContentPageInterface
@@ -45,19 +43,23 @@ abstract class AbstractContentPage implements ContentPageInterface
             }
         }
 
-        foreach (self::TEMPLATE_FORMATS as $templateFormat) {
-            if ($this->environment->getLoader()->exists(sprintf($templateFormat, $this::getLayout()))) {
-                return $this->environment->render(
-                    sprintf($templateFormat, $this::getLayout()),
-                    $this->prepare([
-                        'config' => $config,
-                        'content_areas' => $contentAreasHtml,
-                    ])
-                );
+        $previousException = null;
+        try {
+            foreach (self::TEMPLATE_FORMATS as $templateFormat) {
+                if ($this->environment->getLoader()->exists(sprintf($templateFormat, $this::getLayout()))) {
+                    return $this->environment->render(
+                        sprintf($templateFormat, $this::getLayout()),
+                        $this->prepare([
+                            'config' => $config,
+                            'content_areas' => $contentAreasHtml,
+                        ])
+                    );
+                }
             }
+        } catch (LoaderError|RuntimeError|SyntaxError $exception) {
+            $previousException = $exception;
         }
 
-        // todo add exception text
-        throw new LogicException('Could not find page template');
+        throw new ContentPageNotFoundException($this::getLayout(), $previousException);
     }
 }

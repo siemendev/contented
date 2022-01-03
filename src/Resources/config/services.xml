@@ -5,12 +5,22 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="contented.route_loader" class="Contented\Routing\ContentedRouteLoader" public="true">
-            <call method="setPageConfigLoader">
-                <argument type="service" id="contented.page_config_loader"/>
-            </call>
+            <argument key="$pageConfigLoader" type="service" id="contented.page_config_loader"/>
+            <argument key="$contentPath">%contented.content_path%</argument>
+            <argument key="$languages">%contented.languages%</argument>
             <tag name="routing.loader"/>
         </service>
-        <service id="contented.controller" class="Contented\Controller\ContentPageController" public="true" />
+        <service id="contented.settings_extension" class="Contented\Settings\SettingsExtension" public="false">
+            <argument key="$manager" type="service" id="contented.settings_manager"/>
+            <tag name="twig.extension"/>
+        </service>
+        <service id="contented.settings_manager" class="Contented\Settings\SettingsManager" public="true">
+            <argument key="$contentPath">%contented.content_path%</argument>
+        </service>
+        <service id="Contented\Settings\SettingsManager" alias="contented.settings_manager" />
+        <service id="contented.controller" class="Contented\Controller\ContentPageController" public="true">
+            <argument key="$manager" type="service" id="contented.settings_manager"/>
+        </service>
         <service id="contented.page_config_loader" class="Contented\PageConfigLoader" public="true" />
     </services>
 </container>

@@ -3,21 +3,27 @@ namespace Contented\Controller;
 
 use Contented\ContentModule\ContentModuleInterface;
 use Contented\ContentPage\ContentPageInterface;
-use LogicException;
+use Contented\Exception\ContentModuleNotFoundException;
+use Contented\Exception\ContentPageNotFoundException;
+use Contented\Settings\SettingsManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ContentPageController
 {
     /** @var ContentModuleInterface[] */
-    private $contentModules = [];
+    private array $contentModules = [];
 
     /** @var ContentPageInterface[] */
-    private $contentPages = [];
+    private array $contentPages = [];
+
+    public function __construct(private SettingsManager $manager)
+    {
+    }
 
     public function __invoke(Request $request): Response
     {
-        $config = $request->attributes->get('_configuration');
+        $config = array_merge($request->attributes->get('_configuration'), ['settings' => $this->manager->all()]);
 
         $contentPage = $this->resolvePageLayout($config);
 
@@ -38,7 +44,7 @@ class ContentPageController
             }
         }
 
-        throw new LogicException('Could not find content page ' . $config['layout']);
+        throw new ContentPageNotFoundException($config['layout']);
     }
 
     private function resolveContentModule(array $config): ContentModuleInterface
@@ -49,7 +55,7 @@ class ContentPageController
             }
         }
 
-        throw new LogicException('Could not find content page ' . $config['type']);
+        throw new ContentModuleNotFoundException($config['type']);
     }
 
     public function addContentModule($contentModule): ContentPageController

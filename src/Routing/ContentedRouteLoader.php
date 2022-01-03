@@ -8,25 +8,20 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ContentedRouteLoader extends Loader
 {
-    const LANGUAGES = ['de'];
-
-    /** @var PageConfigLoader */
-    private $pageConfigLoader;
-
-    public function setPageConfigLoader(PageConfigLoader $pageConfigLoader): ContentedRouteLoader
-    {
-        $this->pageConfigLoader = $pageConfigLoader;
-
-        return $this;
+    public function __construct(
+        private PageConfigLoader $pageConfigLoader,
+        private string $contentPath,
+        private array $languages,
+    ) {
+        parent::__construct();
     }
 
-    public function load($resource, string $type = null)
+    public function load($resource, string $type = null): RouteCollection
     {
         $routes = new RouteCollection();
 
-        // todo better i18n support
-        foreach (self::LANGUAGES as $language) {
-            foreach (glob("var/content/$language/*.xml") as $filename) {
+        foreach ($this->languages as $language) {
+            foreach (glob($this->contentPath . "/$language/*.xml") as $filename) {
                 $configuration = $this->pageConfigLoader->resolveXmlToArray($filename);
 
                 foreach ($configuration['routes'] as $path => $options) {
@@ -47,8 +42,8 @@ class ContentedRouteLoader extends Loader
         return $routes;
     }
 
-    public function supports($resource, string $type = null)
+    public function supports($resource, string $type = null): bool
     {
-        return 'contented';
+        return $type === 'contented';
     }
 }

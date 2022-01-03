@@ -1,6 +1,7 @@
 <?php
 namespace Contented\ContentModule;
 
+use Contented\Exception\ContentModuleNotFoundException;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -13,12 +14,8 @@ abstract class AbstractContentModule implements ContentModuleInterface
         "content_modules/%s.twig",
     ];
 
-    /** @var Environment */
-    protected $environment;
-
-    public function __construct(Environment $environment)
+    public function __construct(protected Environment $environment)
     {
-        $this->environment = $environment;
     }
 
     protected function prepare(array $config): array
@@ -26,20 +23,19 @@ abstract class AbstractContentModule implements ContentModuleInterface
         return $config;
     }
 
-    /**
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
     public function render(array $config): string
     {
-        foreach (self::TEMPLATE_FORMATS as $templateFormat) {
-            if ($this->environment->getLoader()->exists(sprintf($templateFormat, $this::getTag()))) {
-                return $this->environment->render(sprintf($templateFormat, $this::getTag()), $this->prepare($config));
+        $previousException = null;
+        try {
+            foreach (self::TEMPLATE_FORMATS as $templateFormat) {
+                if ($this->environment->getLoader()->exists(sprintf($templateFormat, $this::getTag()))) {
+                    return $this->environment->render(sprintf($templateFormat, $this::getTag()), $this->prepare($config));
+                }
             }
+        } catch (LoaderError|RuntimeError|SyntaxError $exception) {
+            $previousException = $exception;
         }
 
-        // TODO throw logic exception to help developers finding their way
-        return '';
+        throw new ContentModuleNotFoundException($this::getTag(), $previousException);
     }
 }
