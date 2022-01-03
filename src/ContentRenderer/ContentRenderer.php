@@ -6,6 +6,7 @@ use Contented\ContentModule\ContentModuleInterface;
 use Contented\ContentPage\ContentPageInterface;
 use Contented\ContentModule\Renderer\ContentModuleRendererInterface;
 use Contented\ContentPage\Renderer\ContentPageRendererInterface;
+use Contented\Exception\ContentRendererNotFoundException;
 
 class ContentRenderer
 {
@@ -30,8 +31,7 @@ class ContentRenderer
             }
         }
 
-        // todo use custom exception
-        throw new \LogicException('renderer not found');
+        throw new ContentRendererNotFoundException('page with layout "' . $contentPage->getLayout() . '"');
     }
 
     public function renderContentModule(ContentModuleInterface $contentModule, array $config = []): string
@@ -42,8 +42,7 @@ class ContentRenderer
             }
         }
 
-        // todo use custom exception
-        throw new \LogicException('renderer not found');
+        throw new ContentRendererNotFoundException('module of type "' . $contentModule->getTag() . '"');
     }
 
     public function addContentPageRenderer(ContentPageRendererInterface $renderer): static
