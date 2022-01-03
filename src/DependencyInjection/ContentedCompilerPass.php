@@ -2,8 +2,10 @@
 
 namespace Contented\DependencyInjection;
 
+use Contented\Settings\SettingsTwigExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ContentedCompilerPass implements CompilerPassInterface
@@ -22,6 +24,15 @@ class ContentedCompilerPass implements CompilerPassInterface
             foreach ($taggedServices as $class => $service) {
                 $controllerDefinition->addMethodCall($method, [new Reference($class)]);
             }
+        }
+
+        if (class_exists('Twig\Environment')) {
+            $container->setDefinition(
+                'contented.settings_extension',
+                (new Definition(SettingsTwigExtension::class, []))
+                    ->addArgument(new Reference('contented.settings_manager'))
+                    ->addTag('twig.extension'),
+            );
         }
     }
 }

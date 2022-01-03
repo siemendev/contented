@@ -9,7 +9,10 @@
     ],
     "require": {
         "ext-simplexml": "*",
-        "twig/twig": "^2.12|^3.0"
+        "php": ">=8"
+    },
+    "suggest": {
+        "twig/twig": "Enables TwigContentPage and TwigContentModule to render content using twig"
     },
     "autoload": {
         "psr-4": {
